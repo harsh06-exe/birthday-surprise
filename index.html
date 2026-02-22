@@ -5,7 +5,6 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* The Camera Background */
         #camera-feed {
             position: fixed;
             top: 0;
@@ -13,10 +12,9 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            z-index: 1; /* Pushed to the back */
+            z-index: 1; 
         }
         
-        /* THIS IS THE FIX: Forces the 3D space OVER the camera */
         a-scene {
             position: absolute;
             top: 0;
@@ -26,14 +24,13 @@
             z-index: 5; 
         }
 
-        /* The UI Buttons */
         #ui-layer {
             position: fixed;
             bottom: 30px;
             left: 0;
             width: 100%;
             text-align: center;
-            z-index: 10; /* Highest layer so it's clickable */
+            z-index: 10; 
         }
         
         button {
@@ -54,10 +51,20 @@
 
     <a-scene transparent="true" vr-mode-ui="enabled: false">
         
+        <a-assets>
+            <a-asset-item id="cake-model" src="cake.glb"></a-asset-item>
+        </a-assets>
+
         <a-light type="ambient" intensity="0.8"></a-light>
         <a-light type="directional" position="-1 2 1" intensity="1.5"></a-light>
 
-        <a-box position="0 0 -3" color="red" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-box>
+        <a-entity 
+            id="birthday-cake"
+            gltf-model="#cake-model"
+            position="0 -0.5 -3" 
+            scale="0.5 0.5 0.5"
+            animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+        </a-entity>
 
         <a-entity camera look-controls="enabled: false"></a-entity>
     </a-scene>
@@ -69,7 +76,6 @@
     <audio id="bg-song" src="song.mp3"></audio>
 
     <script>
-        // Camera Code
         const video = document.getElementById('camera-feed');
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
@@ -79,19 +85,23 @@
                 });
         }
 
-        // Button Logic
         const btn = document.getElementById('action-btn');
         const song = document.getElementById('bg-song');
         let step = 0;
 
         function startExperience() {
             if (step === 0) {
-                song.play();
+                // Audio will play here once you upload the mp3!
+                song.play().catch(e => console.log("No audio file yet"));
                 btn.innerText = "Cut the Cake! 🔪";
                 step = 1;
             } 
             else if (step === 1) {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                
+                // Makes the cake do a little jump when cut
+                document.getElementById('birthday-cake').setAttribute('animation__scale', 'property: scale; to: 0.6 0.6 0.6; dur: 200; dir: alternate; loop: 2');
+                
                 btn.innerText = "Happy Birthday! ❤️";
                 step = 2;
             }

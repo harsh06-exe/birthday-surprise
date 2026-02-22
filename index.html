@@ -6,42 +6,33 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         #camera-feed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            z-index: 1; 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            object-fit: cover; z-index: 1; 
         }
         
         a-scene {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 5; 
         }
 
+        /* THE DARK ROOM EFFECT */
+        #darkness {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: black; z-index: 6; 
+            transition: opacity 2s ease; /* Smooth fade out */
+            pointer-events: none; /* Lets clicks pass through */
+        }
+
         #ui-layer {
-            position: fixed;
-            bottom: 30px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            z-index: 10; 
+            position: fixed; bottom: 30px; left: 0; width: 100%;
+            text-align: center; z-index: 10; 
         }
         
         button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background: #ff6f61;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-weight: bold;
+            padding: 15px 30px; font-size: 18px; background: #ff6f61;
+            color: white; border: none; border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -49,8 +40,9 @@
 
     <video id="camera-feed" autoplay playsinline muted></video>
 
+    <div id="darkness"></div>
+
     <a-scene transparent="true" vr-mode-ui="enabled: false">
-        
         <a-assets>
             <a-asset-item id="cake-model" src="cake.glb"></a-asset-item>
         </a-assets>
@@ -61,8 +53,9 @@
         <a-entity 
             id="birthday-cake"
             gltf-model="#cake-model"
-            position="0 -0.5 -3" 
-            scale="0.5 0.5 0.5"
+            position="0 -1 -3" 
+            scale="15 15 15" 
+            visible="false"
             animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
         </a-entity>
 
@@ -70,7 +63,7 @@
     </a-scene>
 
     <div id="ui-layer">
-        <button id="action-btn" onclick="startExperience()">Tap to Start Party 🎉</button>
+        <button id="action-btn" onclick="startExperience()">Turn on the Lights! 💡</button>
     </div>
 
     <audio id="bg-song" src="song.mp3"></audio>
@@ -79,28 +72,35 @@
         const video = document.getElementById('camera-feed');
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.play();
-                });
+                .then(stream => { video.srcObject = stream; video.play(); });
         }
 
         const btn = document.getElementById('action-btn');
         const song = document.getElementById('bg-song');
+        const cake = document.getElementById('birthday-cake');
+        const darkness = document.getElementById('darkness');
         let step = 0;
 
         function startExperience() {
             if (step === 0) {
-                // Audio will play here once you upload the mp3!
-                song.play().catch(e => console.log("No audio file yet"));
+                // 1. Turn on lights (fade out black screen)
+                darkness.style.opacity = '0';
+                
+                // 2. Play music
+                song.play().catch(e => console.log("Waiting for audio file..."));
+                
+                // 3. Show the Cake
+                cake.setAttribute('visible', 'true');
+                
                 btn.innerText = "Cut the Cake! 🔪";
                 step = 1;
             } 
             else if (step === 1) {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                // 1. Massive Confetti
+                confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
                 
-                // Makes the cake do a little jump when cut
-                document.getElementById('birthday-cake').setAttribute('animation__scale', 'property: scale; to: 0.6 0.6 0.6; dur: 200; dir: alternate; loop: 2');
+                // 2. The "Cut" Effect (Cake shrinks to nothing quickly like a pop)
+                cake.setAttribute('animation__cut', 'property: scale; to: 0 0 0; dur: 400; easing: easeInBack');
                 
                 btn.innerText = "Happy Birthday! ❤️";
                 step = 2;

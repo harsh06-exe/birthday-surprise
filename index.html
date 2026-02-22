@@ -46,9 +46,7 @@
 
     <a-scene embedded transparent="true" vr-mode-ui="enabled: false">
         
-        <a-assets>
-            <a-asset-item id="cake-model" src="cake.glb"></a-asset-item>
-        </a-assets>
+        <a-asset-item id="cake-model" src="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models/2.0/Duck/glTF-Binary/Duck.glb"></a-asset-item>
 
         <a-light type="ambient" intensity="0.8"></a-light>
         <a-light type="directional" position="-1 2 1" intensity="1.5" cast-shadow="true"></a-light>
@@ -57,7 +55,7 @@
             id="birthday-cake"
             gltf-model="#cake-model"
             position="0 -1 -5" 
-            scale="0.02 0.02 0.02"
+            scale="1 1 1"
             rotation="0 0 0"
             animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
         </a-entity>
@@ -133,3 +131,4 @@
 </body>
 
 </html>
+
